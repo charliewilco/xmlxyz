@@ -1,0 +1,23 @@
+{
+	"private": true,
+	"workspaces": [
+		"packages/*"
+	],
+	"scripts": {
+		"dev": "turbo dev",
+		"build": "turbo build",
+		"test": "turbo test"
+	},
+	"devDependencies": {
+		"@changesets/cli": "^2.26.1",
+		"prettier": "^2.8.8",
+		"turbo": "^1.10.2"
+	},
+	"prettier": {
+		"printWidth": 95,
+		"useTabs": true,
+		"bracketSpacing": true,
+		"bracketSameLine": true,
+		"htmlWhitespaceSensitivity": "ignore"
+	}
+}
