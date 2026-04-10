@@ -4,9 +4,9 @@ Small TypeScript workspace for XML-adjacent utilities, now wired for Bun.
 
 ## Packages
 
-- `@xmlxyz/rsskit`: RSS and Atom parsing helpers built on `xml2js`
+- `@xmlxyz/rsskit`: RSS and Atom parsing helpers built on the in-repo `xmlkit` parser
 - `@xmlxyz/html-purify`: plugin-based HTML sanitization utilities
-- `@xmlxyz/xmlkit`: very small XML package scaffold
+- `@xmlxyz/xmlkit`: a small zero-dependency XML parser/builder for the workspace
 
 ## Requirements
 
