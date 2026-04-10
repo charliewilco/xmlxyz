@@ -16,11 +16,11 @@ export const DEFAULT_PLUGINS: SanitizerPlugin[] = [
 	new YoutubeIframeSanitizerPlugin(),
 ];
 
-function createSanitizer(plugins: SanitizerPlugin[] = DEFAULT_PLUGINS, baseURI: string = ''): HTMLSanitizer {
-	return new HTMLSanitizer([
-		...plugins,
-		new RelativeHrefSanitizerPlugin(baseURI)
-	]);
+function createSanitizer(
+	plugins: SanitizerPlugin[] = DEFAULT_PLUGINS,
+	baseURI: string = "",
+): HTMLSanitizer {
+	return new HTMLSanitizer([...plugins, new RelativeHrefSanitizerPlugin(baseURI)]);
 }
 
 export { SanitizerPlugin, createSanitizer };

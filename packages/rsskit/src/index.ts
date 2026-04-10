@@ -307,7 +307,7 @@ export class RSSKit<T, U> {
 					subs: category["itunes:category"]
 						? category["itunes:category"].map((subcategory: any) => ({
 								name: subcategory && subcategory.$ && subcategory.$.text,
-						  }))
+							}))
 						: null,
 				};
 			});
@@ -319,7 +319,7 @@ export class RSSKit<T, U> {
 		if (channel["itunes:keywords"]) {
 			if (channel["itunes:keywords"].length > 1) {
 				feed.itunes.keywords = channel["itunes:keywords"].map(
-					(keyword: any) => keyword && keyword.$ && keyword.$.text
+					(keyword: any) => keyword && keyword.$ && keyword.$.text,
 				);
 			} else {
 				let keywords = channel["itunes:keywords"][0];

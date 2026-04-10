@@ -1,17 +1,22 @@
 {
+	"name": "xmlxyz",
+	"packageManager": "bun@1.3.9",
 	"private": true,
 	"workspaces": [
 		"packages/*"
 	],
 	"scripts": {
-		"dev": "turbo dev",
-		"build": "turbo build",
-		"test": "turbo test"
+		"dev": "bun run --workspaces dev",
+		"build": "bun run --workspaces build",
+		"test": "bun run --workspaces test",
+		"typecheck": "bun run --workspaces typecheck",
+		"format": "prettier --check .",
+		"format:write": "prettier --write ."
 	},
 	"devDependencies": {
-		"@changesets/cli": "^2.26.1",
-		"prettier": "^2.8.8",
-		"turbo": "^1.10.2"
+		"@changesets/cli": "^2.30.0",
+		"bun-types": "^1.3.12",
+		"prettier": "^3.8.2"
 	},
 	"prettier": {
 		"printWidth": 95,

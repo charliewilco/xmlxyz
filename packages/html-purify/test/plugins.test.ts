@@ -1,3 +1,4 @@
+import { describe, expect, test } from "bun:test";
 import { HTMLSanitizer } from "../src/sanitizer";
 import { ScriptAndStyleTagRemoverPlugin } from "../src/plugins/remove-js-css";
 import { XSSSanitizerPlugin } from "../src/plugins/xss";

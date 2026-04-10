@@ -1,10 +1,10 @@
+import { describe, expect, test } from "bun:test";
 import { RSSKit } from "../src";
 
 import { readFile } from "node:fs/promises";
-import path from "node:path";
 
 export const getFixtureAsString = async (filePath: string) => {
-	const buffer = await readFile(path.join("test/fixtures", filePath), {
+	const buffer = await readFile(new URL(`./fixtures/${filePath}`, import.meta.url), {
 		encoding: "utf-8",
 	});
 

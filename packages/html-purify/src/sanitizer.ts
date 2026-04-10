@@ -27,7 +27,7 @@ export class HTMLSanitizer {
 				}
 
 				sanitizedHtml = this.traverse(dom);
-			})
+			}),
 		);
 
 		// Parse the HTML
@@ -50,7 +50,7 @@ export class HTMLSanitizer {
 
 				for (let i = 0; i < this.plugins.length; i++) {
 					const plugin = this.plugins[i];
-					if (plugin.allowedTags.has(tag) || plugin.allowedTags.has('*')) {
+					if (plugin.allowedTags.has(tag) || plugin.allowedTags.has("*")) {
 						allowedByPlugins = true;
 
 						if (plugin.onTag) {
@@ -64,8 +64,10 @@ export class HTMLSanitizer {
 						}
 
 						for (const attr in attrs) {
-							if (plugin.allowedAttributes.has(attr) || plugin.allowedAttributes.has('*')) {
-								const value = plugin.onAttribute ? plugin.onAttribute(attr, attrs[attr]) : attrs[attr];
+							if (plugin.allowedAttributes.has(attr) || plugin.allowedAttributes.has("*")) {
+								const value = plugin.onAttribute
+									? plugin.onAttribute(attr, attrs[attr])
+									: attrs[attr];
 								filteredAttrs[attr] = value;
 							}
 						}

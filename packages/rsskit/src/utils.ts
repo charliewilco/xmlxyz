@@ -4,7 +4,7 @@ import { Builder } from "xml2js";
 export const stripHtml = function (str: string) {
 	str = str.replace(
 		/([^\n])<\/?(h|br|p|ul|ol|li|blockquote|section|table|tr|div)(?:.|\n)*?>([^\n])/gm,
-		"$1\n$3"
+		"$1\n$3",
 	);
 	str = str.replace(/<(?:.|\n)*?>/gm, "");
 	return str;
@@ -68,12 +68,12 @@ export const copyFromXML = function (xml: string, dest: any, fields: any[] = [])
 
 export const maybePromisify = function (
 	callback: (...args: any) => any,
-	promise: Promise<any>
+	promise: Promise<any>,
 ) {
 	if (!callback) return promise;
 	return promise.then(
 		(data) => setTimeout(() => callback(null, data)),
-		(err) => setTimeout(() => callback(err))
+		(err) => setTimeout(() => callback(err)),
 	);
 };
 

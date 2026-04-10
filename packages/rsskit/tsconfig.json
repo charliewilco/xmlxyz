@@ -8,11 +8,11 @@
 		"allowJs": false,
 		"declaration": true,
 		"esModuleInterop": true,
-		"moduleResolution": "node",
+		"moduleResolution": "bundler",
 		"rootDir": "src",
 		"strict": true,
 		"skipLibCheck": true,
-		"types": ["jest", "node"]
+		"types": ["node"]
 	},
 	"include": ["src/**/*"],
 	"exclude": ["node_modules"]
