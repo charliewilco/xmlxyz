@@ -54,3 +54,7 @@ bunx changeset
 ```
 
 Commit the generated `bun.lock` file instead of the old Yarn lockfile.
+
+## Automation
+
+GitHub Actions now runs the workspace verification flow on pull requests and pushes to `main`, and Dependabot checks both Bun dependencies and GitHub Actions weekly.
