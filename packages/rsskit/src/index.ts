@@ -1,4 +1,4 @@
-import { Parser, Options } from "xml2js";
+import { Parser, type Options as XMLParserOptions } from "@xmlxyz/xmlkit";
 import { copyFromXML, getLink, isJSON, getSnippet, getContent } from "./utils";
 import { fields } from "./fields";
 
@@ -14,7 +14,7 @@ export interface CustomFields<T, U> {
 }
 
 export interface ParserOptions {
-	xml2js?: Options;
+	xml2js?: XMLParserOptions;
 	defaultRSS?: number;
 }
 

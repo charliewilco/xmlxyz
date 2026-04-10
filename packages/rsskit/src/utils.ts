@@ -1,5 +1,5 @@
 import { decodeHTML } from "entities";
-import { Builder } from "xml2js";
+import { Builder } from "@xmlxyz/xmlkit";
 
 export const stripHtml = function (str: string) {
 	str = str.replace(
