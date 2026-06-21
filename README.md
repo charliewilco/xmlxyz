@@ -25,6 +25,7 @@ npm install
 npm run build
 npm run test
 npm run typecheck
+npm run benchmark
 npm run format
 ```
 

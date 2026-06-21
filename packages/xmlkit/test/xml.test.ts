@@ -56,4 +56,39 @@ describe("xmlkit", () => {
 			'<div type="xhtml"><p>Hi <b>there</b></p></div>',
 		);
 	});
+
+	test("skips comments and processing instructions around elements", async () => {
+		const parser = new Parser();
+		const document = await parser.parseStringPromise<{
+			root: {
+				item: string[];
+			};
+		}>(`<?xml version="1.0"?><root><!--ignore--><?meta value?><item>kept</item></root>`);
+
+		assert.deepEqual(document.root.item, ["kept"]);
+	});
+
+	test("parses self-closing elements with decoded attributes", async () => {
+		const parser = new Parser();
+		const document = await parser.parseStringPromise<{
+			root: {
+				link: Array<{ $: Record<string, string> }>;
+			};
+		}>(`<root><link href="https://example.com/?a=1&amp;b=2"/></root>`);
+
+		assert.deepEqual(document.root.link[0], {
+			$: {
+				href: "https://example.com/?a=1&b=2",
+			},
+		});
+	});
+
+	test("rejects mismatched closing tags", async () => {
+		const parser = new Parser();
+
+		await assert.rejects(
+			parser.parseStringPromise(`<root><item></root>`),
+			/Expected closing tag <\/item> but found <\/root>/,
+		);
+	});
 });

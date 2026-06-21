@@ -13,7 +13,8 @@
 		"bundle": "tsc",
 		"typecheck": "tsc --noEmit --pretty",
 		"types": "npm run typecheck",
-		"test": "node --import tsx --test test/*.test.ts"
+		"test": "node --import tsx --test test/*.test.ts",
+		"benchmark": "node --import tsx benchmark/*.bench.ts"
 	},
 	"dependencies": {
 		"@xmlxyz/xmlkit": "0.0.1",

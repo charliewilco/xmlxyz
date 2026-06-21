@@ -53,6 +53,18 @@ describe("HTML", () => {
 		assert.equal(result, "<p>hello world</p>");
 	});
 
+	test("preserves nested allowed markup", () => {
+		const html = `<p>Hello <strong>careful</strong> world</p>`;
+		const result = sanitizer.cleanSync(html);
+		assert.equal(result, "<p>Hello <strong>careful</strong> world</p>");
+	});
+
+	test("ignores comments and directives", () => {
+		const html = `<!doctype html><!-- remove me --><p>hello</p>`;
+		const result = sanitizer.cleanSync(html);
+		assert.equal(result, "<p>hello</p>");
+	});
+
 	test("resolves relative URLs on image tags and media tags", () => {
 		const html = `<a href="about">About</a><a href="../home">Home</a>`;
 		const result = sanitizer.cleanSync(html);
