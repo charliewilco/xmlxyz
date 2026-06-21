@@ -1,6 +1,13 @@
-import type { ChildNode } from "domhandler";
 import { DomHandler, Parser } from "htmlparser2";
 import type { SanitizerPlugin } from "./plugins/plugin";
+
+type HTMLNode = {
+	type: string;
+	name?: string;
+	attribs?: Record<string, string>;
+	children?: HTMLNode[];
+	data?: string;
+};
 
 /**
  * 1. Read HTML
@@ -26,7 +33,7 @@ export class HTMLSanitizer {
 					throw err;
 				}
 
-				sanitizedHtml = this.traverse(dom);
+				sanitizedHtml = this.traverse(dom as HTMLNode[]);
 			}),
 		);
 
@@ -37,13 +44,17 @@ export class HTMLSanitizer {
 		return sanitizedHtml;
 	}
 
-	private traverse(nodes: ChildNode[]): string {
+	private traverse(nodes: HTMLNode[]): string {
 		let result = "";
 
 		nodes.forEach((node) => {
 			if (node.type === "tag") {
+				if (!node.name) {
+					return;
+				}
+
 				let tag = node.name;
-				let attrs = node.attribs;
+				let attrs = node.attribs ?? {};
 
 				let filteredAttrs: { [key: string]: string } = {};
 				let allowedByPlugins = false;
@@ -92,7 +103,7 @@ export class HTMLSanitizer {
 
 				result += `</${tag}>`;
 			} else if (node.type === "text") {
-				let text = node.data;
+				let text = node.data ?? "";
 
 				for (let i = 0; i < this.plugins.length; i++) {
 					const plugin = this.plugins[i];

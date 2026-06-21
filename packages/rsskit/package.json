@@ -12,11 +12,12 @@
 		"dev": "tsup --watch",
 		"bundle": "tsc",
 		"typecheck": "tsc --noEmit --pretty",
-		"types": "bun run typecheck",
-		"test": "bun test"
+		"types": "npm run typecheck",
+		"test": "node --import tsx --test test/*.test.ts",
+		"benchmark": "node --import tsx benchmark/*.bench.ts"
 	},
 	"dependencies": {
-		"@xmlxyz/xmlkit": "workspace:*",
+		"@xmlxyz/xmlkit": "0.0.1",
 		"entities": "^8.0.0"
 	},
 	"devDependencies": {

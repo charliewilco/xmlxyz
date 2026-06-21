@@ -1,6 +1,33 @@
-import { describe, expect, test } from "bun:test";
+import assert from "node:assert/strict";
+import { describe, test } from "node:test";
 import { Srcset } from "../src/parse-srcset";
-import { decode, encode } from "he";
+
+const namedEntities: Record<string, string> = {
+	amp: "&",
+	apos: "'",
+	gt: ">",
+	lt: "<",
+	nbsp: "\u00A0",
+	quot: '"',
+};
+
+const decode = (value: string) =>
+	value.replace(/&(#x[0-9a-f]+|#[0-9]+|[a-z]+);/gi, (match, entity) => {
+		if (entity.startsWith("#x")) {
+			return String.fromCodePoint(Number.parseInt(entity.slice(2), 16));
+		}
+
+		if (entity.startsWith("#")) {
+			return String.fromCodePoint(Number.parseInt(entity.slice(1), 10));
+		}
+
+		return namedEntities[entity.toLowerCase()] ?? match;
+	});
+
+const encode = (value: string) =>
+	value.replace(/[\u0000-\u001F\u007F-\uFFFF]/g, (character) => {
+		return `&#x${character.codePointAt(0)?.toString(16).toUpperCase()};`;
+	});
 
 type TestCase = {
 	srcset: string;
@@ -93,7 +120,7 @@ describe("Splitting loop", () => {
 			if (url) {
 				encodedUrl = encode(url);
 			}
-			expect(encodedUrl).toEqual(assertion);
+			assert.equal(encodedUrl, assertion);
 		});
 	});
 });
@@ -152,7 +179,7 @@ describe("Descriptor Tokenizer", () => {
 			if (url) {
 				encodedUrl = encode(url);
 			}
-			expect(encodedUrl).toEqual(assertion);
+			assert.equal(encodedUrl, assertion);
 		});
 	});
 });
@@ -373,7 +400,7 @@ describe("Descriptor Parser", () => {
 			if (url) {
 				encodedUrl = encode(url);
 			}
-			expect(encodedUrl).toEqual(assertion);
+			assert.equal(encodedUrl, assertion);
 		});
 	});
 });

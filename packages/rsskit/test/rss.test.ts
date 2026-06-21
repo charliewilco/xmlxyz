@@ -1,4 +1,5 @@
-import { describe, expect, test } from "bun:test";
+import assert from "node:assert/strict";
+import { describe, test } from "node:test";
 import { RSSKit } from "../src";
 
 import { readFile } from "node:fs/promises";
@@ -18,24 +19,24 @@ describe("RSS", () => {
 		const feed = await getFixtureAsString("guardian.rss");
 		const output = await parser.parse(feed);
 
-		expect(output.title).toBe("The Guardian");
-		expect(output.items.length).toEqual(90);
+		assert.equal(output.title, "The Guardian");
+		assert.equal(output.items.length, 90);
 	});
 
 	test("can parse a podcast RSS feed", async () => {
 		const feed = await getFixtureAsString("serial.rss");
 		const output = await parser.parse(feed);
-		expect(output.title).toBe("Serial");
-		expect(output.items.length).toEqual(46);
-		expect(output.feedUrl).toBe("https://feeds.simplecast.com/xl36XBC2");
-		expect(output.itunes?.image).toContain("serial-itunes-logo.png");
-		expect(output.itunes?.owner).toEqual({
+		assert.equal(output.title, "Serial");
+		assert.equal(output.items.length, 46);
+		assert.equal(output.feedUrl, "https://feeds.simplecast.com/xl36XBC2");
+		assert.ok(output.itunes?.image?.includes("serial-itunes-logo.png"));
+		assert.deepEqual(output.itunes?.owner, {
 			name: "Serial Productions & The New York Times",
 			email: "rich@thislife.org",
 		});
-		expect(output.itunes?.categories).toEqual(["News", "True Crime"]);
-		expect(output.items[0].itunes?.duration).toBe("00:48:50");
-		expect(output.items[0].contentSnippet).toContain("The Improvement Association PAC");
+		assert.deepEqual(output.itunes?.categories, ["News", "True Crime"]);
+		assert.equal(output.items[0].itunes?.duration, "00:48:50");
+		assert.ok(output.items[0].contentSnippet?.includes("The Improvement Association PAC"));
 	});
 
 	test("can parse Atom feeds with rich HTML content", async () => {
@@ -63,16 +64,24 @@ describe("RSS", () => {
 </feed>`;
 		const output = await parser.parse(feed);
 
-		expect(output.title).toBe("Example Feed");
-		expect(output.link).toBe("https://example.com/");
-		expect(output.feedUrl).toBe("https://example.com/feed.xml");
-		expect(output.items[0]).toMatchObject({
-			link: "https://example.com/posts/1",
-			author: "Example Author",
-			id: "tag:example.com,2026:1",
-			summary: "Short summary",
-		});
-		expect(output.items[0].content).toContain("<p>Hi <b>there</b></p>");
-		expect(output.items[0].contentSnippet).toBe("Hi there");
+		assert.equal(output.title, "Example Feed");
+		assert.equal(output.link, "https://example.com/");
+		assert.equal(output.feedUrl, "https://example.com/feed.xml");
+		assert.deepEqual(
+			{
+				link: output.items[0].link,
+				author: output.items[0].author,
+				id: output.items[0].id,
+				summary: output.items[0].summary,
+			},
+			{
+				link: "https://example.com/posts/1",
+				author: "Example Author",
+				id: "tag:example.com,2026:1",
+				summary: "Short summary",
+			},
+		);
+		assert.ok(output.items[0].content?.includes("<p>Hi <b>there</b></p>"));
+		assert.equal(output.items[0].contentSnippet, "Hi there");
 	});
 });

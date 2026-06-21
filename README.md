@@ -1,6 +1,6 @@
 # xmlxyz
 
-Small TypeScript workspace for XML-adjacent utilities, now wired for Bun.
+Small TypeScript workspace for XML-adjacent utilities, now wired for npm.
 
 ## Packages
 
@@ -10,37 +10,39 @@ Small TypeScript workspace for XML-adjacent utilities, now wired for Bun.
 
 ## Requirements
 
-- Bun `1.3.9` or newer
+- Node.js 22 or newer
+- npm 11 or newer
 
 ## Getting Started
 
 ```sh
-bun install
+npm install
 ```
 
 ## Common Commands
 
 ```sh
-bun run build
-bun run test
-bun run typecheck
-bun run format
+npm run build
+npm run test
+npm run typecheck
+npm run benchmark
+npm run format
 ```
 
-Bun fans those commands out across the workspace, and package-level scripts still work if you want to run inside an individual package.
+npm fans those commands out across the workspace, and package-level scripts still work if you want to run inside an individual package.
 
 ## Testing
 
-Jest has been removed in favor of Bun's built-in test runner. Package tests run with:
+Package tests run with Node's built-in test runner:
 
 ```sh
-bun test
+npm test
 ```
 
 from the package directory, or:
 
 ```sh
-bun run test
+npm run test
 ```
 
 from the repo root.
@@ -50,11 +52,11 @@ from the repo root.
 Changesets is still configured for release management:
 
 ```sh
-bunx changeset
+npm exec changeset
 ```
 
-Commit the generated `bun.lock` file instead of the old Yarn lockfile.
+Commit the generated `package-lock.json` file.
 
 ## Automation
 
-GitHub Actions now runs the workspace verification flow on pull requests and pushes to `main`, and Dependabot checks both Bun dependencies and GitHub Actions weekly.
+GitHub Actions now runs the workspace verification flow on pull requests and pushes to `main`, and Dependabot checks both npm dependencies and GitHub Actions weekly.
