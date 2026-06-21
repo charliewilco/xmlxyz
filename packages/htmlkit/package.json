@@ -13,8 +13,7 @@
 		"bundle": "tsc",
 		"typecheck": "tsc --noEmit --pretty",
 		"types": "npm run typecheck",
-		"test": "node --import tsx --test test/*.test.ts",
-		"benchmark": "node --import tsx benchmark/*.bench.ts"
+		"test": "node --import tsx --test test/*.test.ts"
 	},
 	"devDependencies": {
 		"@types/node": "^25.6.0",
