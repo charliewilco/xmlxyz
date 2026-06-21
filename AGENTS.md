@@ -5,10 +5,11 @@
 This repository is a small npm workspace monorepo. The root contains shared tooling in `package.json` and release metadata in `.changeset/`. Library code lives under `packages/`:
 
 - `packages/html-purify/src` with tests in `packages/html-purify/test`
+- `packages/htmlkit/src` with tests in `packages/htmlkit/test`
 - `packages/rsskit/src` with fixtures and tests in `packages/rsskit/test`
 - `packages/xmlkit/src` for XML utilities
 
-Keep source files in `src/`, test files in `test/`, and package-specific build config beside each package (`tsconfig.json`, `tsup.config.ts`).
+Keep source files in `src/`, test files in `test/`, package-specific TypeScript config beside each package (`tsconfig.json`), and shared build tooling in `scripts/`.
 
 ## Build, Test, and Development Commands
 

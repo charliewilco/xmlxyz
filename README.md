@@ -96,7 +96,7 @@ escapeHTMLAttribute(`Tom & "Jerry"`);
 | Command                | Purpose                                                             |
 | ---------------------- | ------------------------------------------------------------------- |
 | `npm run dev`          | Run package watch builds across the workspace.                      |
-| `npm run build`        | Build every package with `tsup`.                                    |
+| `npm run build`        | Build every package with the shared `esbuild` script.               |
 | `npm run test`         | Run package test suites with Node's built-in test runner and `tsx`. |
 | `npm run typecheck`    | Run TypeScript checks without emitting files.                       |
 | `npm run benchmark`    | Run package benchmarks where present.                               |
@@ -107,7 +107,8 @@ escapeHTMLAttribute(`Tom & "Jerry"`);
 
 - Source lives in `packages/*/src`.
 - Tests live in `packages/*/test` and use Node's built-in `node:test` runner.
-- Package builds emit dual ESM/CJS output through each package's `tsup.config.ts`.
+- Package builds emit dual ESM/CJS output through `scripts/build.mjs`, using
+  `esbuild` for bundles and `tsc` for declarations.
 - Generated files, such as `packages/htmlkit/src/generated/entities.ts`, should be
   regenerated from their source process rather than edited by hand.
 - The packages are currently marked `private` while the workspace is being shaped.
