@@ -12,8 +12,8 @@
 		"dev": "tsup --watch",
 		"bundle": "tsc",
 		"typecheck": "tsc --noEmit --pretty",
-		"types": "bun run typecheck",
-		"test": "bun test --pass-with-no-tests"
+		"types": "npm run typecheck",
+		"test": "node --import tsx --test test/*.test.ts"
 	},
 	"devDependencies": {
 		"@types/node": "^25.6.0",

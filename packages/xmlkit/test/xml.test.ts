@@ -1,4 +1,5 @@
-import { describe, expect, test } from "bun:test";
+import assert from "node:assert/strict";
+import { describe, test } from "node:test";
 import { Builder, Parser } from "../src";
 
 describe("xmlkit", () => {
@@ -21,13 +22,13 @@ describe("xmlkit", () => {
 			};
 		}>(xml);
 
-		expect(document.feed.$["xmlns:atom"]).toBe("https://www.w3.org/2005/Atom");
-		expect(document.feed.title[0]).toEqual({
+		assert.equal(document.feed.$["xmlns:atom"], "https://www.w3.org/2005/Atom");
+		assert.deepEqual(document.feed.title[0], {
 			$: { type: "text" },
 			_: "Hello & Goodbye",
 		});
-		expect(document.feed.summary[0]).toBe("<p>Hi there</p>");
-		expect(document.feed["atom:link"][0]).toEqual({
+		assert.equal(document.feed.summary[0], "<p>Hi there</p>");
+		assert.deepEqual(document.feed["atom:link"][0], {
 			$: {
 				href: "https://example.com/feed.xml",
 				rel: "self",
@@ -42,7 +43,7 @@ describe("xmlkit", () => {
 			renderOpts: { pretty: false },
 		});
 
-		expect(
+		assert.equal(
 			builder.buildObject({
 				$: { type: "xhtml" },
 				p: [
@@ -52,6 +53,7 @@ describe("xmlkit", () => {
 					},
 				],
 			}),
-		).toBe('<div type="xhtml"><p>Hi <b>there</b></p></div>');
+			'<div type="xhtml"><p>Hi <b>there</b></p></div>',
+		);
 	});
 });

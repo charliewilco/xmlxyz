@@ -1,6 +1,9 @@
-import { describe, expect, test } from "bun:test";
+import assert from "node:assert/strict";
+import { describe, test } from "node:test";
 import { Srcset } from "../src/parse-srcset";
-import { decode, encode } from "he";
+import he from "he";
+
+const { decode, encode } = he;
 
 type TestCase = {
 	srcset: string;
@@ -93,7 +96,7 @@ describe("Splitting loop", () => {
 			if (url) {
 				encodedUrl = encode(url);
 			}
-			expect(encodedUrl).toEqual(assertion);
+			assert.equal(encodedUrl, assertion);
 		});
 	});
 });
@@ -152,7 +155,7 @@ describe("Descriptor Tokenizer", () => {
 			if (url) {
 				encodedUrl = encode(url);
 			}
-			expect(encodedUrl).toEqual(assertion);
+			assert.equal(encodedUrl, assertion);
 		});
 	});
 });
@@ -373,7 +376,7 @@ describe("Descriptor Parser", () => {
 			if (url) {
 				encodedUrl = encode(url);
 			}
-			expect(encodedUrl).toEqual(assertion);
+			assert.equal(encodedUrl, assertion);
 		});
 	});
 });

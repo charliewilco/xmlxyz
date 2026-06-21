@@ -1,7 +1,7 @@
 version: 2
 
 updates:
-  - package-ecosystem: bun
+  - package-ecosystem: npm
     directory: /
     schedule:
       interval: weekly
@@ -12,7 +12,7 @@ updates:
       prefix: chore
       include: scope
     groups:
-      bun-dependencies:
+      npm-dependencies:
         patterns:
           - "*"
 

@@ -1,4 +1,5 @@
-import { describe, expect, test } from "bun:test";
+import assert from "node:assert/strict";
+import { describe, test } from "node:test";
 import { HTMLSanitizer } from "../src/sanitizer";
 import { ScriptAndStyleTagRemoverPlugin } from "../src/plugins/remove-js-css";
 import { XSSSanitizerPlugin } from "../src/plugins/xss";
@@ -9,7 +10,7 @@ describe.skip("XSSSanitizerPlugin", () => {
 			const plugin = new XSSSanitizerPlugin();
 			const text = '<script>alert("XSS");</script>';
 			const sanitizedText = plugin.onText(text);
-			expect(sanitizedText).toEqual("&lt;script&gt;alert(&quot;XSS&quot;);&lt;/script&gt;");
+			assert.equal(sanitizedText, "&lt;script&gt;alert(&quot;XSS&quot;);&lt;/script&gt;");
 		});
 	});
 });
@@ -19,21 +20,21 @@ describe("ScriptAndStyleTagRemoverPlugin", () => {
 		const sanitizer = new HTMLSanitizer([new ScriptAndStyleTagRemoverPlugin()]);
 		const inputHtml = '<script>alert("XSS!");</script>';
 		const outputHtml = sanitizer.cleanSync(inputHtml);
-		expect(outputHtml).toEqual("");
+		assert.equal(outputHtml, "");
 	});
 
 	test("removes style tags from HTML", () => {
 		const sanitizer = new HTMLSanitizer([new ScriptAndStyleTagRemoverPlugin()]);
 		const inputHtml = "<style>body { font-size: 16px; }</style>";
 		const outputHtml = sanitizer.cleanSync(inputHtml);
-		expect(outputHtml).toEqual("");
+		assert.equal(outputHtml, "");
 	});
 
 	test("allows allowed tags to pass through", () => {
 		const sanitizer = new HTMLSanitizer([new ScriptAndStyleTagRemoverPlugin()]);
 		const inputHtml = '<p>Hello, world!</p><a href="#">Link</a>';
 		const outputHtml = sanitizer.cleanSync(inputHtml);
-		expect(outputHtml).toEqual('<p>Hello, world!</p><a href="#">Link</a>');
+		assert.equal(outputHtml, '<p>Hello, world!</p><a href="#">Link</a>');
 	});
 
 	test("removes disallowed tags from HTML", () => {
@@ -41,6 +42,6 @@ describe("ScriptAndStyleTagRemoverPlugin", () => {
 		const inputHtml =
 			'<img src="image.png"><div><iframe src="https://example.com"></iframe></div>';
 		const outputHtml = sanitizer.cleanSync(inputHtml);
-		expect(outputHtml).toEqual("");
+		assert.equal(outputHtml, "");
 	});
 });
