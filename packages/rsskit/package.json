@@ -17,8 +17,8 @@
 		"benchmark": "node --import tsx benchmark/*.bench.ts"
 	},
 	"dependencies": {
-		"@xmlxyz/xmlkit": "0.0.1",
-		"entities": "^8.0.0"
+		"@xmlxyz/htmlkit": "0.0.1",
+		"@xmlxyz/xmlkit": "0.0.1"
 	},
 	"devDependencies": {
 		"@types/node": "^25.6.0",

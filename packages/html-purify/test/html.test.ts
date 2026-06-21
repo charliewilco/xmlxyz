@@ -59,6 +59,12 @@ describe("HTML", () => {
 		assert.equal(result, "<p>Hello <strong>careful</strong> world</p>");
 	});
 
+	test("escapes decoded text and attribute values when serializing", () => {
+		const html = `<p title="Tom &amp; Jerry">1 &lt; 2 &amp; 3</p>`;
+		const result = sanitizer.cleanSync(html);
+		assert.equal(result, `<p title="Tom &amp; Jerry">1 &lt; 2 &amp; 3</p>`);
+	});
+
 	test("ignores comments and directives", () => {
 		const html = `<!doctype html><!-- remove me --><p>hello</p>`;
 		const result = sanitizer.cleanSync(html);

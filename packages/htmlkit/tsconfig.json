@@ -1,6 +1,5 @@
 {
 	"compilerOptions": {
-		"baseUrl": ".",
 		"outDir": "dist",
 		"module": "esnext",
 		"target": "esnext",
@@ -10,11 +9,7 @@
 		"declaration": true,
 		"esModuleInterop": true,
 		"moduleResolution": "bundler",
-		"rootDir": "..",
-		"paths": {
-			"@xmlxyz/htmlkit": ["../htmlkit/src/index.ts"],
-			"@xmlxyz/xmlkit": ["../xmlkit/src/index.ts"]
-		},
+		"rootDir": "src",
 		"strict": true,
 		"skipLibCheck": true,
 		"types": ["node"]

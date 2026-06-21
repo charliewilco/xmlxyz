@@ -84,4 +84,23 @@ describe("RSS", () => {
 		assert.ok(output.items[0].content?.includes("<p>Hi <b>there</b></p>"));
 		assert.equal(output.items[0].contentSnippet, "Hi there");
 	});
+
+	test("decodes HTML entities in content snippets", async () => {
+		const feed = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+	<channel>
+		<title>Entity Feed</title>
+		<link>https://example.com/</link>
+		<description>Example</description>
+		<item>
+			<title>Entity Item</title>
+			<link>https://example.com/item</link>
+			<description>Tom &amp;amp; Jerry &amp;mdash; &#169;</description>
+		</item>
+	</channel>
+</rss>`;
+		const output = await parser.parse(feed);
+
+		assert.equal(output.items[0].contentSnippet, "Tom & Jerry \u2014 \u00A9");
+	});
 });
