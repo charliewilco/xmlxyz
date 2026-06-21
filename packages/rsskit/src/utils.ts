@@ -1,4 +1,4 @@
-import { decodeHTML } from "entities";
+import { decodeHTMLEntities } from "@xmlxyz/htmlkit";
 import { Builder } from "@xmlxyz/xmlkit";
 
 export const stripHtml = function (str: string) {
@@ -11,7 +11,7 @@ export const stripHtml = function (str: string) {
 };
 
 export const getSnippet = function (str: string) {
-	return decodeHTML(stripHtml(str)).trim();
+	return decodeHTMLEntities(stripHtml(str)).trim();
 };
 
 export const getLink = function (links: any[], rel: string, fallbackIdx: number) {

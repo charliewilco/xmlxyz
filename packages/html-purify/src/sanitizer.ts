@@ -1,13 +1,10 @@
-import { DomHandler, Parser } from "htmlparser2";
+import {
+	escapeHTMLAttribute,
+	escapeHTMLText,
+	parseHTML,
+	type HTMLNode,
+} from "@xmlxyz/htmlkit";
 import type { SanitizerPlugin } from "./plugins/plugin";
-
-type HTMLNode = {
-	type: string;
-	name?: string;
-	attribs?: Record<string, string>;
-	children?: HTMLNode[];
-	data?: string;
-};
 
 /**
  * 1. Read HTML
@@ -17,31 +14,13 @@ type HTMLNode = {
  */
 export class HTMLSanitizer {
 	private plugins: SanitizerPlugin[];
-	private htmlParser?: Parser;
 
 	constructor(plugins: SanitizerPlugin[]) {
 		this.plugins = plugins;
 	}
 
 	public cleanSync(html: string): string {
-		let sanitizedHtml = "";
-
-		// Create a new parser
-		this.htmlParser = new Parser(
-			new DomHandler((err, dom) => {
-				if (err) {
-					throw err;
-				}
-
-				sanitizedHtml = this.traverse(dom as HTMLNode[]);
-			}),
-		);
-
-		// Parse the HTML
-		this.htmlParser.write(html);
-		this.htmlParser.end();
-
-		return sanitizedHtml;
+		return this.traverse(parseHTML(html));
 	}
 
 	private traverse(nodes: HTMLNode[]): string {
@@ -93,7 +72,7 @@ export class HTMLSanitizer {
 					result += `<${tag}>`;
 				} else {
 					result += `<${tag} ${Object.entries(filteredAttrs)
-						.map(([name, value]) => `${name}="${value}"`)
+						.map(([name, value]) => `${name}="${escapeHTMLAttribute(value)}"`)
 						.join(" ")}>`;
 				}
 
@@ -118,7 +97,7 @@ export class HTMLSanitizer {
 					}
 				}
 
-				result += text;
+				result += escapeHTMLText(text);
 			}
 		});
 
