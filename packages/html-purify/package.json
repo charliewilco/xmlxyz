@@ -16,6 +16,7 @@
 	"private": true,
 	"scripts": {
 		"build": "node ../../scripts/build-package.mjs",
+		"clean": "node ../../scripts/clean-package.mjs",
 		"dev": "node ../../scripts/build-package.mjs --watch",
 		"bundle": "npm run build",
 		"typecheck": "tsc --noEmit --pretty",

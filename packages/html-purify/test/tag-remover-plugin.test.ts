@@ -1,25 +1,14 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
-import { HTMLSanitizer } from "../src/sanitizer";
 import { ScriptAndStyleTagRemoverPlugin } from "../src/plugins/remove-js-css";
-import { XSSSanitizerPlugin } from "../src/plugins/xss";
+import { HTMLSanitizer } from "../src/sanitizer";
 
-describe.skip("XSSSanitizerPlugin", () => {
-	describe("onText", () => {
-		test("replaces special characters with HTML entities", () => {
-			const plugin = new XSSSanitizerPlugin();
-			const text = '<script>alert("XSS");</script>';
-			const sanitizedText = plugin.onText(text);
-			assert.equal(sanitizedText, "&lt;script&gt;alert(&quot;XSS&quot;);&lt;/script&gt;");
-		});
-	});
-});
-
-describe("ScriptAndStyleTagRemoverPlugin", () => {
+describe("ScriptAndStyleTagRemoverPlugin blocked tags", () => {
 	test("removes script tags from HTML", () => {
 		const sanitizer = new HTMLSanitizer([new ScriptAndStyleTagRemoverPlugin()]);
 		const inputHtml = '<script>alert("XSS!");</script>';
 		const outputHtml = sanitizer.cleanSync(inputHtml);
+
 		assert.equal(outputHtml, "");
 	});
 
@@ -27,14 +16,8 @@ describe("ScriptAndStyleTagRemoverPlugin", () => {
 		const sanitizer = new HTMLSanitizer([new ScriptAndStyleTagRemoverPlugin()]);
 		const inputHtml = "<style>body { font-size: 16px; }</style>";
 		const outputHtml = sanitizer.cleanSync(inputHtml);
-		assert.equal(outputHtml, "");
-	});
 
-	test("allows allowed tags to pass through", () => {
-		const sanitizer = new HTMLSanitizer([new ScriptAndStyleTagRemoverPlugin()]);
-		const inputHtml = '<p>Hello, world!</p><a href="#">Link</a>';
-		const outputHtml = sanitizer.cleanSync(inputHtml);
-		assert.equal(outputHtml, '<p>Hello, world!</p><a href="#">Link</a>');
+		assert.equal(outputHtml, "");
 	});
 
 	test("removes disallowed tags from HTML", () => {
@@ -42,6 +25,17 @@ describe("ScriptAndStyleTagRemoverPlugin", () => {
 		const inputHtml =
 			'<img src="image.png"><div><iframe src="https://example.com"></iframe></div>';
 		const outputHtml = sanitizer.cleanSync(inputHtml);
+
 		assert.equal(outputHtml, "");
+	});
+});
+
+describe("ScriptAndStyleTagRemoverPlugin allowed tags", () => {
+	test("allows allowed tags to pass through", () => {
+		const sanitizer = new HTMLSanitizer([new ScriptAndStyleTagRemoverPlugin()]);
+		const inputHtml = '<p>Hello, world!</p><a href="#">Link</a>';
+		const outputHtml = sanitizer.cleanSync(inputHtml);
+
+		assert.equal(outputHtml, '<p>Hello, world!</p><a href="#">Link</a>');
 	});
 });

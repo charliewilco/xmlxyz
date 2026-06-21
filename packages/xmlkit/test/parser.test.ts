@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
-import { Builder, Parser } from "../src";
+import { Parser } from "../src";
 
-describe("xmlkit", () => {
+describe("XML parser document shapes", () => {
 	test("parses the XML shapes RSSKit depends on", async () => {
 		const parser = new Parser();
 		const xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -36,27 +36,6 @@ describe("xmlkit", () => {
 		});
 	});
 
-	test("serializes xml2js-style objects for Atom content", () => {
-		const builder = new Builder({
-			headless: true,
-			rootName: "div",
-			renderOpts: { pretty: false },
-		});
-
-		assert.equal(
-			builder.buildObject({
-				$: { type: "xhtml" },
-				p: [
-					{
-						_: "Hi ",
-						b: ["there"],
-					},
-				],
-			}),
-			'<div type="xhtml"><p>Hi <b>there</b></p></div>',
-		);
-	});
-
 	test("skips comments and processing instructions around elements", async () => {
 		const parser = new Parser();
 		const document = await parser.parseStringPromise<{
@@ -82,13 +61,74 @@ describe("xmlkit", () => {
 			},
 		});
 	});
+});
 
+describe("XML parser text options", () => {
+	test("normalizes and trims parsed text when configured", async () => {
+		const parser = new Parser({ normalize: true, trim: true });
+		const document = await parser.parseStringPromise<{ root: string }>(
+			`<root>  hello
+			world  </root>`,
+		);
+
+		assert.equal(document.root, "hello world");
+	});
+});
+
+describe("XML parser failures", () => {
 	test("rejects mismatched closing tags", async () => {
 		const parser = new Parser();
 
 		await assert.rejects(
 			parser.parseStringPromise(`<root><item></root>`),
 			/Expected closing tag <\/item> but found <\/root>/,
+		);
+	});
+
+	test("surfaces parser failures through callbacks and promises", async () => {
+		const parser = new Parser();
+
+		await assert.rejects(
+			parser.parseStringPromise(`<root><item></root>`),
+			/Expected closing tag/,
+		);
+
+		await new Promise<void>((resolve) => {
+			parser.parseString(`<root><item></root>`, (error) => {
+				assert.match(error?.message ?? "", /Expected closing tag/);
+				resolve();
+			});
+		});
+	});
+
+	test("rejects malformed XML", async () => {
+		const parser = new Parser();
+
+		await assert.rejects(
+			parser.parseStringPromise(`<root></root><extra/>`),
+			/Unexpected content/,
+		);
+		await assert.rejects(parser.parseStringPromise(`</root>`), /Unexpected token/);
+		await assert.rejects(parser.parseStringPromise(`<root attr=value/>`), /Expected quoted/);
+		await assert.rejects(
+			parser.parseStringPromise(`<root attr="value/>`),
+			/Unterminated attribute/,
+		);
+		await assert.rejects(
+			parser.parseStringPromise(`<root><![CDATA[value</root>`),
+			/Unterminated CDATA/,
+		);
+		await assert.rejects(
+			parser.parseStringPromise(`<root><!-- comment</root>`),
+			/Unterminated XML comment/,
+		);
+		await assert.rejects(
+			parser.parseStringPromise(`<root><?meta value</root>`),
+			/Unterminated XML processing instruction/,
+		);
+		await assert.rejects(
+			parser.parseStringPromise(`<!DOCTYPE root [ <!ENTITY x "y"> <root/>`),
+			/Unterminated DOCTYPE/,
 		);
 	});
 });

@@ -8,6 +8,8 @@
 	"scripts": {
 		"dev": "npm run dev --workspaces",
 		"build": "npm run build --workspaces",
+		"clean": "npm run clean --workspaces --if-present",
+		"coverage": "npm run build && node --import tsx --test --experimental-test-coverage --test-coverage-include='packages/*/src/**/*.ts' --test-coverage-exclude='packages/*/src/generated/**' --test-coverage-lines=90 --test-coverage-functions=90 --test-coverage-branches=90 packages/*/test/*.test.ts",
 		"test": "npm run test --workspaces",
 		"typecheck": "npm run typecheck --workspaces",
 		"benchmark": "npm run benchmark --workspaces --if-present",
