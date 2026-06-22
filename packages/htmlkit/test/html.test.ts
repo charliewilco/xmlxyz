@@ -41,6 +41,23 @@ describe("HTML parser elements", () => {
 			],
 		);
 	});
+
+	test("normalizes tag and attribute names while preserving decoded values", () => {
+		assert.deepEqual(
+			parseHTML(`<DIV DATA-ID='Tom &amp; Jerry'><BR><IMG SRC=test.png></DIV>`),
+			[
+				{
+					type: "tag",
+					name: "div",
+					attribs: { "data-id": "Tom & Jerry" },
+					children: [
+						{ type: "tag", name: "br", attribs: {}, children: [] },
+						{ type: "tag", name: "img", attribs: { src: "test.png" }, children: [] },
+					],
+				},
+			],
+		);
+	});
 });
 
 describe("HTML parser non-content tokens", () => {
@@ -60,6 +77,38 @@ describe("HTML parser recovery", () => {
 	test("treats malformed markup as text", () => {
 		assert.deepEqual(parseHTML(`<3 <p title="unterminated`), [
 			{ type: "text", data: `<3 <p title="unterminated` },
+		]);
+	});
+
+	test("recovers from nested malformed markup without dropping later siblings", () => {
+		assert.deepEqual(parseHTML(`<section><p>one<strong>two</p><em>three</em></section>`), [
+			{
+				type: "tag",
+				name: "section",
+				attribs: {},
+				children: [
+					{
+						type: "tag",
+						name: "p",
+						attribs: {},
+						children: [
+							{ type: "text", data: "one" },
+							{
+								type: "tag",
+								name: "strong",
+								attribs: {},
+								children: [{ type: "text", data: "two" }],
+							},
+						],
+					},
+					{
+						type: "tag",
+						name: "em",
+						attribs: {},
+						children: [{ type: "text", data: "three" }],
+					},
+				],
+			},
 		]);
 	});
 

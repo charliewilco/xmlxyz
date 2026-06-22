@@ -10,8 +10,8 @@ fixtures, scripts, and content tooling.
 npm install @xmlxyz/xmlkit
 ```
 
-The package is currently private inside the `xmlxyz` workspace. For local
-development, install from the workspace root with `npm install`.
+For local workspace development, install from the repository root with
+`npm install`.
 
 ## Parse XML
 
@@ -55,6 +55,8 @@ import { Parser } from "@xmlxyz/xmlkit";
 const parser = new Parser({
 	trim: true,
 	normalize: true,
+	maxDepth: 100,
+	maxInputLength: 5_000_000,
 });
 
 const document = await parser.parseStringPromise(`<root> Hello   world </root>`);
@@ -116,10 +118,12 @@ builder.buildObject({ _: "Hello", $: { lang: "en" } });
 
 Parser options:
 
-| Option      | Purpose                                                        |
-| ----------- | -------------------------------------------------------------- |
-| `trim`      | Trim leading and trailing whitespace in text nodes.            |
-| `normalize` | Collapse runs of whitespace in text nodes into a single space. |
+| Option           | Purpose                                                        |
+| ---------------- | -------------------------------------------------------------- |
+| `trim`           | Trim leading and trailing whitespace in text nodes.            |
+| `normalize`      | Collapse runs of whitespace in text nodes into a single space. |
+| `maxDepth`       | Maximum element nesting depth. Defaults to `100`.              |
+| `maxInputLength` | Maximum XML string length. Defaults to `5_000_000`.            |
 
 Builder options:
 
@@ -155,4 +159,5 @@ class XML {
 XMLKit is deliberately compact. It is a good fit for feeds and controlled XML
 documents, not a full validating XML processor. It does not evaluate external
 entities, validate against schemas, preserve comments, or round-trip every source
-formatting detail.
+formatting detail. Parser errors include line, column, and index details to make
+bad feed and fixture debugging easier.

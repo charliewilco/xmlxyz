@@ -33,7 +33,12 @@ export interface Candidate {
 }
 
 export class Srcset {
-	public static parse(input: string): Partial<Candidate>[] {
+	public static parse(
+		input: string,
+		options: {
+			failOnInvalid?: boolean;
+		} = {},
+	): Partial<Candidate>[] {
 		// UTILITY FUNCTIONS
 
 		// Manual is faster than RegEx
@@ -42,6 +47,7 @@ export class Srcset {
 		function collectCharacters(regEx: RegExp): string | undefined {
 			var match = regEx.exec(input.substring(pos));
 			if (match) {
+				pos += match[0].length;
 				return match[0];
 			}
 		}
@@ -328,8 +334,8 @@ export class Srcset {
 					candidate.h = h;
 				}
 				candidates.push(candidate);
-			} else {
-				console.log("Invalid srcset descriptor found in '" + input + "' at '" + desc + "'.");
+			} else if (options.failOnInvalid) {
+				throw new Error(`Invalid srcset descriptor "${desc}".`);
 			}
 		}
 	}

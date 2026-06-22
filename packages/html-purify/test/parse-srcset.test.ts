@@ -94,16 +94,16 @@ describe("Splitting loop", () => {
 			expect: "data:,a",
 			desc: "leading space comma space comma comma",
 		},
-		{ srcset: "&nbsp;data:,a", expect: "&nbsp;data:,a", desc: "leading non-breaking space" },
+		{ srcset: "&nbsp;data:,a", expect: "&#xA0;data:,a", desc: "leading non-breaking space" },
 		{
 			srcset: "data:,a&nbsp;",
-			expect: "data:,a&nbsp;",
+			expect: "data:,a&#xA0;",
 			desc: "trailing non-breaking space",
 		},
 	];
 
 	cases.forEach(({ srcset, expect: assertion, desc }) => {
-		test.skip(desc.concat("encodedUrl should match expected value"), () => {
+		test(desc.concat(" encodedUrl should match expected value"), () => {
 			const origAttr = srcset;
 			const attrDecoded = decode(origAttr);
 			const parsed = Srcset.parse(attrDecoded);
@@ -162,7 +162,7 @@ describe("Descriptor Tokenizer", () => {
 		},
 	];
 	cases.forEach(({ srcset, expect: assertion, desc }) => {
-		test.skip(desc.concat("encodedUrl should match expected value"), () => {
+		test(desc.concat(" encodedUrl should match expected value"), () => {
 			const origAttr = srcset;
 			const attrDecoded = decode(origAttr);
 			const parsed = Srcset.parse(attrDecoded);
@@ -383,7 +383,7 @@ describe("Descriptor Parser", () => {
 	];
 
 	cases.forEach(({ srcset, expect: assertion, desc }) => {
-		test.skip(desc.concat("encodedUrl should match expected value"), () => {
+		test(desc.concat(" encodedUrl should match expected value"), () => {
 			const origAttr = srcset;
 			const attrDecoded = decode(origAttr);
 			const parsed = Srcset.parse(attrDecoded);

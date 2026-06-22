@@ -5,7 +5,6 @@ import type { SanitizerPlugin } from "./plugin";
 
 export class ScriptAndStyleTagRemoverPlugin implements SanitizerPlugin {
 	allowedTags: Set<string> = new Set([
-		"*",
 		"!doctype",
 		"html",
 		"head",

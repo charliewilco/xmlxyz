@@ -89,6 +89,87 @@ describe("Default RSS feeds", () => {
 	});
 });
 
+describe("Custom fields", () => {
+	test("copies custom feed and item fields with aliases, arrays, and snippets", async () => {
+		const output = await new RSSKit({
+			defaultRSS: 2,
+			customFields: {
+				feed: [["custom:owner", "owner"]],
+				item: [
+					["custom:score", "score"],
+					["custom:tag", "customTags", { keepArray: true }],
+					["custom:html", "customHtml", { includeSnippet: true }],
+				],
+			},
+		}).parse(`
+<rss>
+	<channel>
+		<title>Custom</title>
+		<custom:owner>Charlie</custom:owner>
+		<item>
+			<title>One</title>
+			<custom:score>10</custom:score>
+			<custom:tag>a</custom:tag>
+			<custom:tag>b</custom:tag>
+			<custom:html>&lt;p&gt;Tom &amp;amp; Jerry&lt;/p&gt;</custom:html>
+		</item>
+	</channel>
+</rss>`);
+
+		assert.equal(output.owner, "Charlie");
+		assert.equal(output.items[0].score, "10");
+		assert.deepEqual(output.items[0].customTags, ["a", "b"]);
+		assert.equal(output.items[0].customHtml, "<p>Tom &amp; Jerry</p>");
+		assert.equal(output.items[0].customHtmlSnippet, "Tom & Jerry");
+	});
+});
+
+describe("Media RSS", () => {
+	test("extracts common item-level media fields", async () => {
+		const output = await new RSSKit({ defaultRSS: 2 }).parse(`
+<rss>
+	<channel>
+		<title>Media</title>
+		<item>
+			<title>One</title>
+			<media:title>Media title</media:title>
+			<media:description>Media description</media:description>
+			<media:credit scheme="urn:test">Media credit</media:credit>
+			<media:thumbnail url="https://example.com/thumb.jpg" width="120" height="80"/>
+			<media:content url="https://example.com/video.mp4" type="video/mp4" medium="video" width="640" height="360">
+				<media:title>Content title</media:title>
+				<media:credit>Content credit</media:credit>
+			</media:content>
+		</item>
+	</channel>
+</rss>`);
+
+		assert.deepEqual(output.items[0].media, {
+			content: [
+				{
+					url: "https://example.com/video.mp4",
+					type: "video/mp4",
+					medium: "video",
+					width: "640",
+					height: "360",
+					title: "Content title",
+					credit: "Content credit",
+				},
+			],
+			thumbnails: [
+				{
+					url: "https://example.com/thumb.jpg",
+					width: "120",
+					height: "80",
+				},
+			],
+			title: "Media title",
+			description: "Media description",
+			credit: "Media credit",
+		});
+	});
+});
+
 describe("Feed recognition errors", () => {
 	test("rejects unrecognized feeds and invalid default RSS versions", async () => {
 		await assert.rejects(parser.parse(`<not-feed/>`), /Feed not recognized/);

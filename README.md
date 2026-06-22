@@ -15,9 +15,9 @@ static-site tooling, and content pipelines.
 | `@xmlxyz/htmlkit`     | Parse HTML fragments, decode HTML entities, and escape text or attributes.   | [packages/htmlkit](./packages/htmlkit/README.md)         |
 | `@xmlxyz/xmlkit`      | Parse XML into xml2js-style objects and serialize objects back to XML.       | [packages/xmlkit](./packages/xmlkit/README.md)           |
 
-The packages are intentionally small. They are useful when you want predictable
-content utilities without bringing a browser DOM, a large feed reader, or a full
-XML stack into your project.
+The packages are intentionally small public utilities. They are useful when you
+want predictable content tooling without bringing a browser DOM, a large feed
+reader, or a full XML stack into your project.
 
 ## Quick Start
 
@@ -111,7 +111,15 @@ escapeHTMLAttribute(`Tom & "Jerry"`);
   `esbuild` for bundles and `tsc` for declarations.
 - Generated files, such as `packages/htmlkit/src/generated/entities.ts`, should be
   regenerated from their source process rather than edited by hand.
-- The packages are currently marked `private` while the workspace is being shaped.
+- Package tarballs are checked with `npm run pack:dry-run`.
+
+## Public Scope
+
+`xmlxyz` v1 is scoped to controlled content pipelines, feed processing, fixtures,
+scripts, and static-site tooling. It is not a validating XML processor, a browser
+DOM implementation, or a hostile-input HTML sanitizer. In particular,
+`@xmlxyz/html-purify` is a trusted-fragment cleaner with an allow-list plugin
+pipeline; use a battle-tested sanitizer for public user-generated HTML.
 
 ## Releases
 

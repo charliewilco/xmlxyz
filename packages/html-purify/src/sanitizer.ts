@@ -6,6 +6,23 @@ import {
 } from "@xmlxyz/htmlkit";
 import type { SanitizerPlugin } from "./plugins/plugin";
 
+const VOID_ELEMENTS = new Set([
+	"area",
+	"base",
+	"br",
+	"col",
+	"embed",
+	"hr",
+	"img",
+	"input",
+	"link",
+	"meta",
+	"param",
+	"source",
+	"track",
+	"wbr",
+]);
+
 /**
  * 1. Read HTML
  * 2. Detect any malicious HTML
@@ -68,12 +85,17 @@ export class HTMLSanitizer {
 					return;
 				}
 
-				if (Object.keys(filteredAttrs).length === 0) {
-					result += `<${tag}>`;
-				} else {
-					result += `<${tag} ${Object.entries(filteredAttrs)
-						.map(([name, value]) => `${name}="${escapeHTMLAttribute(value)}"`)
-						.join(" ")}>`;
+				const serializedAttrs =
+					Object.keys(filteredAttrs).length === 0
+						? ""
+						: ` ${Object.entries(filteredAttrs)
+								.map(([name, value]) => `${name}="${escapeHTMLAttribute(value)}"`)
+								.join(" ")}`;
+
+				result += `<${tag}${serializedAttrs}>`;
+
+				if (VOID_ELEMENTS.has(tag)) {
+					return;
 				}
 
 				if (node.children) {

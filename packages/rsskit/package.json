@@ -6,6 +6,23 @@
 	"main": "dist/index.cjs",
 	"module": "dist/index.js",
 	"types": "dist/index.d.ts",
+	"files": [
+		"dist",
+		"README.md",
+		"LICENSE"
+	],
+	"engines": {
+		"node": ">=22"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/charliewilco/xmlxyz.git",
+		"directory": "packages/rsskit"
+	},
+	"bugs": {
+		"url": "https://github.com/charliewilco/xmlxyz/issues"
+	},
+	"homepage": "https://github.com/charliewilco/xmlxyz/tree/main/packages/rsskit#readme",
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
@@ -13,7 +30,6 @@
 			"require": "./dist/index.cjs"
 		}
 	},
-	"private": true,
 	"scripts": {
 		"build": "node ../../scripts/build.mjs",
 		"clean": "node ../../scripts/clean.mjs",

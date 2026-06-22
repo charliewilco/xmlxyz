@@ -10,8 +10,8 @@ allow-list instead of a full browser DOM sanitizer.
 npm install @xmlxyz/html-purify
 ```
 
-The package is currently private inside the `xmlxyz` workspace. For local
-development, install from the workspace root with `npm install`.
+For local workspace development, install from the repository root with
+`npm install`.
 
 ## Basic Usage
 
@@ -48,6 +48,10 @@ The default sanitizer:
 - allows HTTP and HTTPS links
 - resolves relative links when a base URL is provided
 - allows image tags only when `src` is an HTTP(S) `.jpg`, `.jpeg`, `.gif`, or `.png`
+  URL
+- allows `srcset` only when every candidate is an HTTP(S) `.jpg`, `.jpeg`, `.gif`,
+  or `.png` URL
+- allows YouTube embed iframes from `https://www.youtube.com/embed/`
 
 ## Custom Plugins
 
@@ -75,7 +79,9 @@ sanitizer.cleanSync(`<span data-user-id=" 42 ">Charlie</span>`);
 ```
 
 Returning an empty string from `onTag` or `onText` removes that node. Returning a
-string from `onAttribute` replaces the attribute value.
+tag name from `onTag` keeps or rewrites the tag. Returning a string from
+`onAttribute` replaces the attribute value. Plugins should not return serialized
+HTML from `onTag`; serialization is owned by the sanitizer.
 
 Passing a custom plugin array replaces the defaults. To extend the default
 sanitizer, include `DEFAULT_PLUGINS`:

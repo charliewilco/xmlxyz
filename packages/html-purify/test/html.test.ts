@@ -79,4 +79,31 @@ describe("HTML", () => {
 			`<a href="https://test/workbench/about">About</a><a href="https://test/home">Home</a>`,
 		);
 	});
+
+	test("preserves allowed image srcset attributes and serializes img as void", () => {
+		const html = `<img src="https://example.com/image.png" srcset="https://example.com/image.png 1x, https://example.com/image@2x.png 2x" alt="Example">`;
+		const result = sanitizer.cleanSync(html);
+
+		assert.equal(
+			result,
+			`<img src="https://example.com/image.png" srcset="https://example.com/image.png 1x, https://example.com/image@2x.png 2x" alt="Example">`,
+		);
+	});
+
+	test("removes images with unsafe srcset candidates", () => {
+		const html = `<img src="https://example.com/image.png" srcset="https://example.com/image.png 1x, javascript:alert(1) 2x" alt="Example">`;
+		const result = sanitizer.cleanSync(html);
+
+		assert.equal(result, "");
+	});
+
+	test("serializes YouTube iframes through the sanitizer pipeline", () => {
+		const html = `<iframe src="https://www.youtube.com/embed/abc" width="640" onload="alert(1)"></iframe>`;
+		const result = sanitizer.cleanSync(html);
+
+		assert.equal(
+			result,
+			`<iframe src="https://www.youtube.com/embed/abc" width="640"></iframe>`,
+		);
+	});
 });

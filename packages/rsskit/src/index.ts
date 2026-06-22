@@ -1,21 +1,24 @@
 import { Parser, type Options as XMLParserOptions } from "@xmlxyz/xmlkit";
 import { copyFromXML, getLink, isJSON, getSnippet, getContent } from "./utils";
-import { fields } from "./fields";
+import { fields, type Field, type FieldOptions } from "./fields";
 
 export const DEFAULT_HEADERS = {
 	"User-Agent": "rss-parser",
 	Accept: "application/rss+xml",
 };
-type CustomFieldItem<U> = keyof U | { keepArray: boolean };
+export type CustomField = Field;
 
-export interface CustomFields<T, U> {
-	readonly feed?: Array<keyof T>;
-	readonly item?: CustomFieldItem<U>[] | CustomFieldItem<U>[][];
+export type CustomFieldOptions = FieldOptions;
+
+export interface CustomFields {
+	feed?: CustomField[];
+	item?: CustomField[];
 }
 
 export interface ParserOptions {
 	xml2js?: XMLParserOptions;
 	defaultRSS?: number;
+	customFields?: CustomFields;
 }
 
 export interface Enclosure {
@@ -36,6 +39,38 @@ export interface RSSItem {
 	categories?: string[];
 	contentSnippet?: string;
 	enclosure?: Enclosure;
+	media?: MediaRSS;
+}
+
+export interface MediaContent {
+	url?: string;
+	type?: string;
+	medium?: string;
+	width?: string;
+	height?: string;
+	fileSize?: string;
+	expression?: string;
+	bitrate?: string;
+	duration?: string;
+	lang?: string;
+	title?: string;
+	description?: string;
+	credit?: string;
+}
+
+export interface MediaThumbnail {
+	url?: string;
+	width?: string;
+	height?: string;
+	time?: string;
+}
+
+export interface MediaRSS {
+	content?: MediaContent[];
+	thumbnails?: MediaThumbnail[];
+	title?: string;
+	description?: string;
+	credit?: string;
 }
 
 export interface PaginationLinks {
@@ -73,7 +108,7 @@ export interface RSSOutput<U> {
 	};
 }
 
-export class RSSKit<T, U> {
+export class RSSKit<T = Record<string, unknown>, U = Record<string, unknown>> {
 	public options: ParserOptions;
 	public xmlParser: Parser;
 	constructor(options: ParserOptions = {}) {
@@ -144,7 +179,7 @@ export class RSSKit<T, U> {
 
 	private buildAtomFeed(xmlObj: any) {
 		let feed: any = { items: [] };
-		copyFromXML(xmlObj.feed, feed);
+		copyFromXML(xmlObj.feed, feed, this.feedFields);
 		if (xmlObj.feed.link) {
 			feed.link = getLink(xmlObj.feed.link, "alternate", 0);
 			feed.feedUrl = getLink(xmlObj.feed.link, "self", 1);
@@ -163,7 +198,7 @@ export class RSSKit<T, U> {
 
 	private parseItemAtom(entry?: any) {
 		let item: any = {};
-		copyFromXML(entry, item);
+		copyFromXML(entry, item, this.itemFields);
 		if (entry.title) {
 			let title = entry.title[0] || "";
 			if (title._) title = title._;
@@ -193,6 +228,7 @@ export class RSSKit<T, U> {
 		if (entry.id) {
 			item.id = entry.id[0];
 		}
+		this.decorateMedia(item, entry);
 		this.setISODate(item);
 		return item;
 	}
@@ -223,8 +259,8 @@ export class RSSKit<T, U> {
 	private buildRSS(channel: any, items: any[]) {
 		items = items || [];
 		let feed: any = { items: [] };
-		let feedFields = fields.feed;
-		let itemFields = fields.item;
+		let feedFields = this.feedFields;
+		let itemFields = this.itemFields;
 		if (channel["atom:link"] && channel["atom:link"][0] && channel["atom:link"][0].$) {
 			feed.feedUrl = channel["atom:link"][0].$.href;
 		}
@@ -261,8 +297,73 @@ export class RSSKit<T, U> {
 			if (item.guid._) item.guid = item.guid._;
 		}
 		if (xmlItem.category) item.categories = xmlItem.category;
+		this.decorateMedia(item, xmlItem);
 		this.setISODate(item);
 		return item;
+	}
+
+	private decorateMedia(item: any, xmlItem: any) {
+		const media: MediaRSS = {};
+
+		const mediaContent = this.mapMediaNodes<MediaContent>(xmlItem["media:content"]);
+		if (mediaContent.length) {
+			media.content = mediaContent;
+		}
+
+		const thumbnails = this.mapMediaNodes<MediaThumbnail>(xmlItem["media:thumbnail"]);
+		if (thumbnails.length) {
+			media.thumbnails = thumbnails;
+		}
+
+		const title = this.getXMLText(xmlItem["media:title"]?.[0]);
+		if (title) {
+			media.title = title;
+		}
+
+		const description = this.getXMLText(xmlItem["media:description"]?.[0]);
+		if (description) {
+			media.description = description;
+		}
+
+		const credit = this.getXMLText(xmlItem["media:credit"]?.[0]);
+		if (credit) {
+			media.credit = credit;
+		}
+
+		if (Object.keys(media).length) {
+			item.media = media;
+		}
+	}
+
+	private mapMediaNodes<T extends object>(nodes: any[] | undefined): T[] {
+		return (nodes || []).map((node) => {
+			const value: Record<string, string> = { ...(node.$ || {}) };
+			const title = this.getXMLText(node["media:title"]?.[0]);
+			const description = this.getXMLText(node["media:description"]?.[0]);
+			const credit = this.getXMLText(node["media:credit"]?.[0]);
+
+			if (title) {
+				value.title = title;
+			}
+			if (description) {
+				value.description = description;
+			}
+			if (credit) {
+				value.credit = credit;
+			}
+
+			return value as T;
+		});
+	}
+
+	private getXMLText(value: any): string | undefined {
+		if (typeof value === "string") {
+			return value;
+		}
+
+		if (value && typeof value._ === "string") {
+			return value._;
+		}
 	}
 
 	/**
@@ -379,5 +480,13 @@ export class RSSKit<T, U> {
 			paginationLinks[link.$.rel] = link.$.href;
 			return paginationLinks;
 		}, {});
+	}
+
+	private get feedFields() {
+		return [...fields.feed, ...(this.options.customFields?.feed || [])];
+	}
+
+	private get itemFields() {
+		return [...fields.item, ...(this.options.customFields?.item || [])];
 	}
 }

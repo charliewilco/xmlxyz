@@ -14,7 +14,8 @@
 		"typecheck": "npm run typecheck --workspaces",
 		"benchmark": "npm run benchmark --workspaces --if-present",
 		"format": "prettier --check .",
-		"format:write": "prettier --write ."
+		"format:write": "prettier --write .",
+		"pack:dry-run": "npm pack --workspaces --dry-run"
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.30.0",

@@ -1,6 +1,8 @@
 export interface XMLParserOptions {
 	trim?: boolean;
 	normalize?: boolean;
+	maxDepth?: number;
+	maxInputLength?: number;
 }
 
 export interface XMLBuilderOptions {
@@ -31,6 +33,8 @@ interface XMLNode {
 const SPECIAL_KEYS = new Set(["$", "_"]);
 const WHITESPACE = /\s/;
 const ENTITY_REGEX = /&(#x?[0-9a-f]+|[a-z]+);/gi;
+const DEFAULT_MAX_DEPTH = 100;
+const DEFAULT_MAX_INPUT_LENGTH = 5_000_000;
 const NAMED_ENTITIES: Record<string, string> = {
 	amp: "&",
 	apos: "'",
@@ -76,27 +80,29 @@ class XMLTokenizer {
 	}
 
 	public parse(options: XMLParserOptions = {}): XMLDocument {
+		this.assertInputLength(options);
 		this.skipWhitespace();
 		this.skipMisc();
 		this.skipWhitespace();
 
-		const root = this.parseElement(options);
+		const root = this.parseElement(options, 1);
 		this.skipWhitespace();
 		this.skipMisc();
 		this.skipWhitespace();
 
 		if (!this.isAtEnd()) {
-			throw new Error(`Unexpected content after root element at index ${this.index}.`);
+			throw this.error("Unexpected content after root element.");
 		}
 
 		return { [root.name]: this.toXMLValue(root, options) };
 	}
 
-	private parseElement(options: XMLParserOptions): XMLNode {
+	private parseElement(options: XMLParserOptions, depth: number): XMLNode {
+		this.assertDepth(options, depth);
 		this.expect("<");
 
 		if (this.peek() === "/" || this.peek() === "!" || this.peek() === "?") {
-			throw new Error(`Unexpected token at index ${this.index}.`);
+			throw this.error("Unexpected token.");
 		}
 
 		const name = this.readName();
@@ -141,7 +147,7 @@ class XMLTokenizer {
 			}
 
 			if (this.peek() === "<") {
-				node.children.push(this.parseElement(options));
+				node.children.push(this.parseElement(options, depth + 1));
 				continue;
 			}
 
@@ -151,7 +157,7 @@ class XMLTokenizer {
 		this.expect("</");
 		const closingName = this.readName();
 		if (closingName !== name) {
-			throw new Error(`Expected closing tag </${name}> but found </${closingName}>.`);
+			throw this.error(`Expected closing tag </${name}> but found </${closingName}>.`);
 		}
 		this.skipWhitespace();
 		this.expect(">");
@@ -222,7 +228,7 @@ class XMLTokenizer {
 			const quote = this.peek();
 
 			if (quote !== '"' && quote !== "'") {
-				throw new Error(`Expected quoted attribute value at index ${this.index}.`);
+				throw this.error("Expected quoted attribute value.");
 			}
 
 			this.index += 1;
@@ -230,7 +236,7 @@ class XMLTokenizer {
 			const closingQuoteIndex = this.source.indexOf(quote, this.index);
 
 			if (closingQuoteIndex === -1) {
-				throw new Error(`Unterminated attribute value for "${name}".`);
+				throw this.error(`Unterminated attribute value for "${name}".`);
 			}
 
 			this.index = closingQuoteIndex;
@@ -246,7 +252,7 @@ class XMLTokenizer {
 		const closingIndex = this.source.indexOf("]]>", this.index);
 
 		if (closingIndex === -1) {
-			throw new Error("Unterminated CDATA section.");
+			throw this.error("Unterminated CDATA section.");
 		}
 
 		const value = this.source.slice(this.index, closingIndex);
@@ -274,7 +280,7 @@ class XMLTokenizer {
 		}
 
 		if (start === this.index) {
-			throw new Error(`Expected name at index ${this.index}.`);
+			throw this.error("Expected name.");
 		}
 
 		return this.source.slice(start, this.index);
@@ -311,7 +317,7 @@ class XMLTokenizer {
 		const closingIndex = this.source.indexOf("-->", this.index);
 
 		if (closingIndex === -1) {
-			throw new Error("Unterminated XML comment.");
+			throw this.error("Unterminated XML comment.");
 		}
 
 		this.index = closingIndex + 3;
@@ -322,7 +328,7 @@ class XMLTokenizer {
 		const closingIndex = this.source.indexOf("?>", this.index);
 
 		if (closingIndex === -1) {
-			throw new Error("Unterminated XML processing instruction.");
+			throw this.error("Unterminated XML processing instruction.");
 		}
 
 		this.index = closingIndex + 2;
@@ -371,7 +377,21 @@ class XMLTokenizer {
 			this.index += 1;
 		}
 
-		throw new Error("Unterminated DOCTYPE declaration.");
+		throw this.error("Unterminated DOCTYPE declaration.");
+	}
+
+	private assertInputLength(options: XMLParserOptions) {
+		const maxInputLength = options.maxInputLength ?? DEFAULT_MAX_INPUT_LENGTH;
+		if (this.source.length > maxInputLength) {
+			throw this.error(`Input exceeds maxInputLength of ${maxInputLength}.`, maxInputLength);
+		}
+	}
+
+	private assertDepth(options: XMLParserOptions, depth: number) {
+		const maxDepth = options.maxDepth ?? DEFAULT_MAX_DEPTH;
+		if (depth > maxDepth) {
+			throw this.error(`XML depth exceeds maxDepth of ${maxDepth}.`);
+		}
 	}
 
 	private skipWhitespace() {
@@ -395,8 +415,29 @@ class XMLTokenizer {
 
 	private expect(value: string) {
 		if (!this.consume(value)) {
-			throw new Error(`Expected "${value}" at index ${this.index}.`);
+			throw this.error(`Expected "${value}".`);
 		}
+	}
+
+	private error(message: string, index = this.index) {
+		const { line, column } = this.getPosition(index);
+		return new Error(`${message} at line ${line}, column ${column} (index ${index}).`);
+	}
+
+	private getPosition(index: number) {
+		let line = 1;
+		let column = 1;
+
+		for (let i = 0; i < index && i < this.source.length; i++) {
+			if (this.source[i] === "\n") {
+				line += 1;
+				column = 1;
+			} else {
+				column += 1;
+			}
+		}
+
+		return { line, column };
 	}
 
 	private peek() {

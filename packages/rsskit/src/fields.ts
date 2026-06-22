@@ -1,4 +1,12 @@
-type Field = string[] | string | [string, string, { includeSnippet: true }];
+export interface FieldOptions {
+	keepArray?: boolean;
+	includeSnippet?: boolean;
+}
+
+export type Field =
+	| string
+	| [from: string, to: string]
+	| [from: string, to: string, options: FieldOptions];
 
 export interface IAllFields {
 	feed: Array<Field>;
@@ -60,7 +68,7 @@ fields.item = [
 	"comments",
 ];
 
-var mapItunesField = function (f: string) {
+var mapItunesField = function (f: string): Field {
 	return ["itunes:" + f, f];
 };
 

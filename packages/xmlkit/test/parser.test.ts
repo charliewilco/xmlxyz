@@ -85,6 +85,27 @@ describe("XML parser failures", () => {
 		);
 	});
 
+	test("includes line, column, and index in parser errors", async () => {
+		const parser = new Parser();
+
+		await assert.rejects(
+			parser.parseStringPromise(`<root>\n\t<item></root>`),
+			/line 2, column \d+ \(index \d+\)/,
+		);
+	});
+
+	test("rejects input that exceeds configured parser limits", async () => {
+		await assert.rejects(
+			new Parser({ maxDepth: 2 }).parseStringPromise(`<root><item><nested/></item></root>`),
+			/XML depth exceeds maxDepth of 2/,
+		);
+
+		await assert.rejects(
+			new Parser({ maxInputLength: 10 }).parseStringPromise(`<root>too long</root>`),
+			/Input exceeds maxInputLength of 10/,
+		);
+	});
+
 	test("surfaces parser failures through callbacks and promises", async () => {
 		const parser = new Parser();
 

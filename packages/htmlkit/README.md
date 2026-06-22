@@ -9,8 +9,8 @@ parsing, HTML entity decoding, and text or attribute escaping.
 npm install @xmlxyz/htmlkit
 ```
 
-The package is currently private inside the `xmlxyz` workspace. For local
-development, install from the workspace root with `npm install`.
+For local workspace development, install from the repository root with
+`npm install`.
 
 ## Parse HTML Fragments
 
@@ -102,3 +102,9 @@ decodeHTMLEntities(value: string): string
 escapeHTMLText(value: string): string
 escapeHTMLAttribute(value: string): string
 ```
+
+## Scope
+
+HTMLKit is a fragment parser and entity helper for content tooling. It is not a
+browser DOM, does not implement full HTML tree-construction behavior, and should
+not be used as a security boundary by itself.
