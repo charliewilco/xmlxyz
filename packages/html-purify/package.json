@@ -44,7 +44,7 @@
 		"@xmlxyz/htmlkit": "0.0.1"
 	},
 	"devDependencies": {
-		"@types/node": "^26.0.0",
+		"@types/node": "^26.1.0",
 		"typescript": "7.0.1-rc"
 	}
 }
