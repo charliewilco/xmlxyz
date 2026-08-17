@@ -18,10 +18,10 @@
 		"pack:dry-run": "npm pack --workspaces --dry-run"
 	},
 	"devDependencies": {
-		"@changesets/cli": "^2.30.0",
-		"esbuild": "^0.28.1",
-		"prettier": "^3.8.2",
-		"tsx": "^4.21.0"
+		"@changesets/cli": "^3.0.0",
+		"esbuild": "^0.28.2",
+		"prettier": "^3.9.6",
+		"tsx": "^4.23.12"
 	},
 	"prettier": {
 		"printWidth": 95,
